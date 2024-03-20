@@ -1,0 +1,148 @@
+---
+- import_playbook: community.fqcn_migration.fqcn_migration
+  vars:
+    project_git_url: https://github.com/kubevirt/kubevirt.core.git
+    upstream_name: core
+    upstream_namespace: kubevirt
+    downstream_name: openshift_virtualization
+    downstream_namespace: redhat
+    galaxy:
+      documentation: https://docs.openshift.com/container-platform/latest/virt/about_virt/about-virt.html
+      homepage: https://www.redhat.com/en/technologies/cloud-computing/openshift/virtualization
+    post_processors_replacements:
+      - match: 'Lean Ansible bindings for KubeVirt'
+        replace: 'Lean Ansible bindings for OpenShift Virtualization'
+        file: 'README.md$'
+      - match: 'redhat-redhat.openshift_virtualization-\*.tar.gz'
+        replace: 'kubevirt-core-*.tar.gz'
+        file: 'README.md$'
+      - match: '`redhat`'
+        replace: '`kubevirt`'
+        file: 'README.md$'
+      - match: 'redhat_vm'
+        replace: 'kubevirt_vm'
+        file: 'README.md$|plugins/modules/.+\.py$'
+      - match: 'redhat_vm_info'
+        replace: 'kubevirt_vm_info'
+        file: 'CHANGELOG.rst$|README.md$|plugins/modules/.+\.py$'
+      - match: 'KubeVirt Collection for Ansible'
+        replace: 'OpenShift Virtualization Collection for Ansible'
+        file: 'CHANGELOG.rst$'
+      - match: 'module_utils\.k8s\.openshift_virtualization'
+        replace: 'module_utils.k8s.core'
+        file: 'plugins/modules/.+\.py$'
+      - match: 'k8s\.openshift_virtualization'
+        replace: 'kubernetes.core'
+        file: 'plugins/modules/.+\.py$'
+      - match: 'kubernetes\.openshift_virtualization'
+        replace: 'kubernetes.core'
+        file: 'requirements.yml$|plugins/.+/.+\.py$'
+      - match: 'redhat.io'
+        replace: 'kubevirt.io'
+        file: 'plugins/.+/.+\.py$'
+      - match: 'name: redhat'
+        replace: 'name: kubevirt'
+        file: 'plugins/inventory/kubevirt.py$'
+      - match: '\*\.redhat\.\(yml\|yaml\)'
+        replace: '*.kubevirt.(yml|yaml)'
+        file: 'plugins/inventory/kubevirt.py$'
+      - match: 'redhat\.\[yml\|yaml\]'
+        replace: 'kubevirt.[yml|yaml]'
+        file: 'plugins/inventory/kubevirt.py$'
+      - match: '"redhat"'
+        replace: '"kubevirt"'
+        file: 'plugins/inventory/kubevirt.py$'
+      - match: 'redhat\.openshift_virtualization\.redhat'
+        replace: 'redhat.openshift_virtualization.kubevirt'
+        file: 'plugins/inventory/kubevirt.py$'
+      - match: 'kubernetes\.openshift_virtualization\.kubectl'
+        replace: 'kubernetes.core.kubectl'
+        file: 'plugins/inventory/kubevirt.py$'
+      - match: 'redhat\.yml'
+        replace: 'kubevirt.yml'
+        file: 'plugins/inventory/kubevirt.py$'
+      - match: 'redhat\.yaml'
+        replace: 'kubevirt.yaml'
+        file: 'plugins/inventory/kubevirt.py$'
+      - match: 'redhat/kubesecondarydns'
+        replace: 'kubevirt/kubesecondarydns'
+        file: 'plugins/inventory/kubevirt.py$'
+    downstream_placeholder_delete:
+      - build_status
+    downstream_placeholder_content:
+      - placeholder: requires_ansible
+        content: |
+          ## Ansible and Python version compatibility
+
+          This collection has been tested against Ansible versions **>=2.14,<=2.16** and Python versions **>=3.9,<=3.12**.
+
+          See the [Ansible core support matrix](https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix) for supported combinations.
+      - placeholder: galaxy_download
+        content: |
+          ### Installing the Collection from Ansible Galaxy
+
+          Before using the collection, you need to setup Ansible Automation Hub as galaxy server; then install it with the Ansible Galaxy command-line tool:
+          ```bash
+          ansible-galaxy collection install redhat.openshift_virtualization
+          ```
+      - placeholder: collection_dependencies
+        content: |
+          #### Ansible collections
+
+          * [kubernetes.core](https://console.redhat.com/ansible/automation-hub/repo/published/kubernetes/core)>=3.0.1
+
+          To install all the dependencies, you need to setup Ansible Automation Hub as galaxy server; then install them with:
+          ```bash
+          ansible-galaxy collection install -r requirements.yml
+          ```
+      - placeholder: community_readme
+        content: |
+          ## Testing
+
+          The collection includes unit and integration tests. The integration tests require a working cluster.
+
+          ### Running tests
+
+          To run tests the `ansible-test` tool is required. See [Testing Ansible and Collections](https://docs.ansible.com/ansible/latest/dev_guide/testing_running_locally.html#testing-ansible-and-collections)
+          on how to run the collection's tests.
+
+
+- connection: local
+  gather_facts: false
+  hosts: localhost
+  tasks:
+    - name: Change description in downstream galaxy.yml
+      ansible.builtin.lineinfile:
+        path: "{{ downstream_project}}/galaxy.yml"
+        regexp: '^description: '
+        line: "description: Lean Ansible bindings for OpenShift Virtualization"
+    - name: Fix changelog line
+      ansible.builtin.lineinfile:
+        path: "{{ downstream_project}}/docs/CHANGELOG.md"
+        regexp: '^-   Add redhat\\_vm\\_info'
+        line: '-   Add kubevirt\_vm\_info module to describe existing VirtualMachines'
+    - name: Find test file to migrate to downstream collection
+      ansible.builtin.find:
+        path: "downstream/openshift_virtualization/tests"
+        patterns: '*.py,*.sh,*.yml,*.yaml'
+        recurse: true
+      register: find_test
+    - name: Migrate tests to use downstream collection
+      ansible.builtin.replace:
+        path: "{{ item.path }}"
+        regexp: 'kubevirt\.core\.(\w+)'
+        replace: 'redhat.openshift_virtualization.\1'
+      loop: "{{ find_test.files }}"
+    - name: Remove unwanted files from downstream collection
+      ansible.builtin.file:
+        path: "{{ downstream_project}}/{{ item }}"
+        state: absent
+      loop:
+        - CONTRIBUTING.md
+        - docs/CONTRIBUTING.md
+        - docs/developing.md
+        - docs/testing.md
+    - name: Rebuild downstream collection
+      ansible.builtin.command: ansible-galaxy collection build --force .
+      args:
+        chdir: "{{ downstream_project }}"

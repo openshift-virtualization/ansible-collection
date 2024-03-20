@@ -1,0 +1,57 @@
+---
+name: Transform, test and release collection
+# yamllint disable-line rule:truthy
+on:
+  push:
+    tags:
+      - "*.*.*"
+
+jobs:
+  transform:
+    uses: ./.github/workflows/transform.yml
+
+  sanity:
+    needs: transform
+    uses: ./.github/workflows/sanity.yml
+    with:
+      ansible_versions: ${{ vars.ANSIBLE_VERSIONS }}
+      python_versions: ${{ vars.PYTHON_VERSIONS }}
+      matrix_exclude: ${{ vars.MATRIX_EXCLUDE }}
+
+  unit:
+    needs: transform
+    uses: ./.github/workflows/unit.yml
+    with:
+      ansible_versions: ${{ vars.ANSIBLE_VERSIONS }}
+      python_versions: ${{ vars.PYTHON_VERSIONS }}
+      matrix_exclude: ${{ vars.MATRIX_EXCLUDE }}
+
+  integration:
+    needs:
+      - sanity
+      - unit
+    uses: ./.github/workflows/integration.yml
+    with:
+      ansible_versions: ${{ vars.ANSIBLE_VERSIONS }}
+      python_versions: ${{ vars.PYTHON_VERSIONS }}
+      matrix_exclude: ${{ vars.MATRIX_EXCLUDE }}
+
+  release:
+    needs: integration
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: collection-tarball
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v1
+        with:
+          body: |
+            Version ${{ github.ref_name }} of the `redhat.openshift_virtualization` collection.
+          fail_on_unmatched_files: true
+          files: |
+            redhat-openshift_virtualization-*.tar.gz

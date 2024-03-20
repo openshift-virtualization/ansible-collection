@@ -1,0 +1,52 @@
+---
+name: Unit tests
+# yamllint disable-line rule:truthy
+on:
+  workflow_call:
+    inputs:
+      ansible_versions:
+        required: true
+        type: string
+      python_versions:
+        required: true
+        type: string
+      matrix_exclude:
+        required: true
+        type: string
+
+jobs:
+  unit:
+    strategy:
+      fail-fast: false
+      matrix:
+        ansible-version: ${{ fromJSON(inputs.ansible_versions) }}
+        python-version: ${{ fromJSON(inputs.python_versions) }}
+        exclude: ${{ fromJSON(inputs.matrix_exclude) }}
+    runs-on: ubuntu-latest
+    name: ${{ matrix.ansible-version }}, py${{ matrix.python-version }}
+    env:
+      collection_dir: ansible_collections/redhat/openshift_virtualization
+      work_dir: /home/runner/.ansible/collections
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: collection-tarball
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install ansible-core ${{ matrix.ansible-version }}
+        run: |
+          pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible-version }}.tar.gz --disable-pip-version-check
+
+      - name: Install collection
+        run: |
+          ansible-galaxy collection install -p ${{ env.work_dir }} redhat-openshift_virtualization-*.tar.gz
+
+      - name: Run unit tests
+        working-directory: ${{ env.work_dir }}/${{ env.collection_dir }}
+        run: |
+          ansible-test units --requirements --python ${{ matrix.python-version }}
