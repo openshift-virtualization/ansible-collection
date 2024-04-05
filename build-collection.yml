@@ -6,9 +6,11 @@
     upstream_namespace: kubevirt
     downstream_name: openshift_virtualization
     downstream_namespace: redhat
+    plugin_replacement_strict: True
     galaxy:
       documentation: https://docs.openshift.com/container-platform/latest/virt/about_virt/about-virt.html
       homepage: https://www.redhat.com/en/technologies/cloud-computing/openshift/virtualization
+      description: Lean Ansible bindings for OpenShift Virtualization
     post_processors_replacements:
       - match: 'Lean Ansible bindings for KubeVirt'
         replace: 'Lean Ansible bindings for OpenShift Virtualization'
@@ -21,52 +23,16 @@
         file: 'README.md$'
       - match: 'redhat_vm'
         replace: 'kubevirt_vm'
-        file: 'README.md$|plugins/modules/.+\.py$'
+        file: 'README.md$'
       - match: 'redhat_vm_info'
         replace: 'kubevirt_vm_info'
-        file: 'CHANGELOG.rst$|README.md$|plugins/modules/.+\.py$'
+        file: 'CHANGELOG.rst$|README.md$'
       - match: 'KubeVirt Collection for Ansible'
         replace: 'OpenShift Virtualization Collection for Ansible'
         file: 'CHANGELOG.rst$'
-      - match: 'module_utils\.k8s\.openshift_virtualization'
-        replace: 'module_utils.k8s.core'
-        file: 'plugins/modules/.+\.py$'
-      - match: 'k8s\.openshift_virtualization'
-        replace: 'kubernetes.core'
-        file: 'plugins/modules/.+\.py$'
       - match: 'kubernetes\.openshift_virtualization'
         replace: 'kubernetes.core'
-        file: 'requirements.yml$|plugins/.+/.+\.py$'
-      - match: 'redhat.io'
-        replace: 'kubevirt.io'
-        file: 'plugins/.+/.+\.py$'
-      - match: 'name: redhat'
-        replace: 'name: kubevirt'
-        file: 'plugins/inventory/kubevirt.py$'
-      - match: '\*\.redhat\.\(yml\|yaml\)'
-        replace: '*.kubevirt.(yml|yaml)'
-        file: 'plugins/inventory/kubevirt.py$'
-      - match: 'redhat\.\[yml\|yaml\]'
-        replace: 'kubevirt.[yml|yaml]'
-        file: 'plugins/inventory/kubevirt.py$'
-      - match: '"redhat"'
-        replace: '"kubevirt"'
-        file: 'plugins/inventory/kubevirt.py$'
-      - match: 'redhat\.openshift_virtualization\.redhat'
-        replace: 'redhat.openshift_virtualization.kubevirt'
-        file: 'plugins/inventory/kubevirt.py$'
-      - match: 'kubernetes\.openshift_virtualization\.kubectl'
-        replace: 'kubernetes.core.kubectl'
-        file: 'plugins/inventory/kubevirt.py$'
-      - match: 'redhat\.yml'
-        replace: 'kubevirt.yml'
-        file: 'plugins/inventory/kubevirt.py$'
-      - match: 'redhat\.yaml'
-        replace: 'kubevirt.yaml'
-        file: 'plugins/inventory/kubevirt.py$'
-      - match: 'redhat/kubesecondarydns'
-        replace: 'kubevirt/kubesecondarydns'
-        file: 'plugins/inventory/kubevirt.py$'
+        file: 'requirements.yml$'
     downstream_placeholder_delete:
       - build_status
     downstream_placeholder_content:
@@ -111,11 +77,6 @@
   gather_facts: false
   hosts: localhost
   tasks:
-    - name: Change description in downstream galaxy.yml
-      ansible.builtin.lineinfile:
-        path: "{{ downstream_project}}/galaxy.yml"
-        regexp: '^description: '
-        line: "description: Lean Ansible bindings for OpenShift Virtualization"
     - name: Fix changelog line
       ansible.builtin.lineinfile:
         path: "{{ downstream_project}}/docs/CHANGELOG.md"
