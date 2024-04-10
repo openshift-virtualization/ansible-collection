@@ -63,6 +63,12 @@
           ```
       - placeholder: community_readme
         content: |
+          ## Providing feedback and reporting issues
+
+          If you encounter any issues with this collection please go to the [Red Hat Customer Portal](https://access.redhat.com/support/cases/#/case/new/get-support?caseCreate=true) and open a support case.
+
+          Additionally, to report an issue or to improve this collection, you can also log in to your [Red Hat Jira account](https://issues.redhat.com) and submit a [Jira issue](https://issues.redhat.com/secure/CreateIssueDetails!init.jspa?pid=12323181&issuetype=1&components=12364490&priority=10200&summary=[redhat.openshift_virtualization]&customfield_12316142).
+
           ## Testing
 
           The collection includes unit and integration tests. The integration tests require a working cluster.
