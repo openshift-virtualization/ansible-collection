@@ -25,10 +25,6 @@ jobs:
       - name: Install dependency collections
         run: |
           ansible-galaxy collection install -r requirements.yml
-          # Make fqcn_migration compatible with Ubuntu
-          TASK_PATH=~/.ansible/collections/ansible_collections/community/fqcn_migration/roles/fqcn_migration/tasks/utils/convert_rst_to_md.yml
-          sed -i 's/ansible\.builtin\.yum\|ansible\.builtin\.dnf/ansible.builtin.package/g' "${TASK_PATH}"
-          sed -i '/use_backend/d' "${TASK_PATH}"
 
       - name: Transform collection
         env:
