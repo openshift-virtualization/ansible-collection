@@ -83,14 +83,9 @@
   gather_facts: false
   hosts: localhost
   tasks:
-    - name: Fix too long line in 1.5.0
-      ansible.builtin.lineinfile:
-        path: "{{ downstream_project }}/plugins/inventory/kubevirt.py"
-        regexp: "^                msg=\"The 'connections' parameter is deprecated and starting with version"
-        line: "                msg=\"The 'connections' parameter is deprecated and starting with version 2.0.0 of redhat.openshift_virtualization\"\n                + \"supports only a single entry.\","
     - name: Fix changelog line
       ansible.builtin.lineinfile:
-        path: "{{ downstream_project }}/docs/CHANGELOG.md"
+        path: "{{ downstream_project}}/docs/CHANGELOG.md"
         regexp: '^-   Add redhat\\_vm\\_info'
         line: '-   Add kubevirt\_vm\_info module to describe existing VirtualMachines'
     - name: Find test file to migrate to downstream collection
