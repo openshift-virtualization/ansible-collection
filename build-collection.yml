@@ -40,7 +40,7 @@
         content: |
           ## Ansible and Python version compatibility
 
-          This collection has been tested against Ansible versions **>=2.14,<=2.16** and Python versions **>=3.9,<=3.12**.
+          This collection has been tested against Ansible versions **>=2.14,<=2.17** and Python versions **>=3.9,<=3.12**.
 
           See the [Ansible core support matrix](https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix) for supported combinations.
       - placeholder: galaxy_download
@@ -55,7 +55,7 @@
         content: |
           #### Ansible collections
 
-          * [kubernetes.core](https://console.redhat.com/ansible/automation-hub/repo/published/kubernetes/core)>=3.0.1
+          * [kubernetes.core](https://console.redhat.com/ansible/automation-hub/repo/published/kubernetes/core)>=3.1.0,<6.0.0
 
           To install all the dependencies, you need to setup Ansible Automation Hub as galaxy server; then install them with:
           ```bash
