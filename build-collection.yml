@@ -91,7 +91,7 @@
     - name: Find test file to migrate to downstream collection
       ansible.builtin.find:
         path: "downstream/openshift_virtualization/tests"
-        patterns: '*.py,*.sh,*.yml,*.yaml'
+        patterns: '*.py,*.sh,*.yml,*.yaml,*.j2'
         recurse: true
       register: find_test
     - name: Migrate tests to use downstream collection
