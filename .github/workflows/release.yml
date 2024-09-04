@@ -48,7 +48,7 @@ jobs:
           name: collection-tarball
 
       - name: Publish release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           body: |
             Version ${{ github.ref_name }} of the `redhat.openshift_virtualization` collection.
