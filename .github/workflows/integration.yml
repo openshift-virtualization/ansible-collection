@@ -22,6 +22,7 @@ jobs:
         test-target:
           - kubevirt_vm
           - kubevirt_vm_info
+          - kubevirt_vmi_info
           - inventory_kubevirt
         ansible-version: ${{ fromJSON(inputs.ansible_versions) }}
         python-version: ${{ fromJSON(inputs.python_versions) }}
