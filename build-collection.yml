@@ -42,7 +42,7 @@
 
           This collection has been tested against Ansible versions **>=2.16,<=2.19** and Python versions **>=3.10,<=3.13**.
 
-          See the [Ansible core support matrix](https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix) for supported combinations.
+          See the [Red Hat Ansible Automation Platform Life Cycle](https://access.redhat.com/support/policy/updates/ansible-automation-platform) for supported combinations.
       - placeholder: galaxy_download
         content: |
           ### Installing the Collection from Ansible Galaxy
@@ -55,7 +55,7 @@
         content: |
           #### Ansible collections
 
-          * [kubernetes.core](https://console.redhat.com/ansible/automation-hub/repo/published/kubernetes/core)>=5.2.0,<6.0.0
+          * [kubernetes.core](https://console.redhat.com/ansible/automation-hub/repo/published/kubernetes/core)>=5.2.0,<7.0.0
 
           To install all the dependencies, you need to setup Ansible Automation Hub as galaxy server; then install them with:
           ```bash
@@ -63,6 +63,12 @@
           ```
       - placeholder: community_readme
         content: |
+          ## Support
+
+          This collection is maintained by Red Hat OpenShift Virtualization.
+
+          As Red Hat Ansible Certified Content, this collection is entitled to support through the Ansible Automation Platform (AAP) using the **Create issue** button on the top right corner.
+
           ## Providing feedback and reporting issues
 
           If you encounter any issues with this collection please go to the [Red Hat Customer Portal](https://access.redhat.com/support/cases/#/case/new/get-support?caseCreate=true) and open a support case.
